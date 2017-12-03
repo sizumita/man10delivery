@@ -1,0 +1,10 @@
+name: Minedelivery
+version: @version@
+main: red.man10.minedelivery.Minedelivery
+
+commands:
+   sironeko:
+      description: This is a demo command.
+      usage: /<command> [h] [player]
+      permission: tutorialplugin.sironeko
+      permission-message: You don't have <permission>
