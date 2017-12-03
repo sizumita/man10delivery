@@ -47,6 +47,9 @@ public final class Minedelivery extends JavaPlugin {
                     return false;
                 }
                 Player t = Bukkit.getPlayer(args[1]);
+                if(t == null){
+                    return false;
+                }
                 ItemStack items = t.getInventory().getItemInMainHand();
                 String string = itemStackArrayToBase64(new ItemStack[]{items});
                 sender.sendMessage(string);
