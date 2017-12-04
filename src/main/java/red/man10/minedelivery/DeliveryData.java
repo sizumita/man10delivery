@@ -26,7 +26,7 @@ public class DeliveryData {
         return del;
     }
 
-    public int createdelivery(UUID uuid1,UUID uuid2){
+    public int createdelivery(UUID uuid1,UUID uuid2,String item){
 
         String senduser = Bukkit.getOfflinePlayer(uuid1).getName();
         String getuser = Bukkit.getOfflinePlayer(uuid2).getName();
@@ -37,6 +37,7 @@ public class DeliveryData {
                 +"','" + uuid2.toString()
                 +"','" + senduser
                 +"','" + getuser
+                +"','" + item
                 +",NULL,NULL,NULL,NULL"
 
                 +");");
@@ -81,6 +82,7 @@ public class DeliveryData {
             "  `uuid2` varchar(40) NOT NULL DEFAULT '' COMMENT 'UUID',\n" +
             "  `senduser` varchar(40) NOT NULL DEFAULT '' COMMENT 'UUID',\n" +
             "  `getuser` varchar(40) NOT NULL DEFAULT '' COMMENT 'UUID',\n" +
+            "  `item` varchar(400) NOT NULL DEFAULT '' COMMENT 'Item',\n" +
             "  PRIMARY KEY (`id`)\n" +
             ") ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;";
 

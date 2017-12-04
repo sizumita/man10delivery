@@ -1,4 +1,5 @@
 package red.man10.minedelivery;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,7 +15,6 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import red.man10.minedelivery.DeliveryData;
 import java.util.UUID;
 public final class Minedelivery extends JavaPlugin {
 
@@ -31,7 +31,7 @@ public final class Minedelivery extends JavaPlugin {
     }
 
 
-    public boolean onCommand(CommandSender sender, Command cmd,String commandLabel,UUID id, String[] args){
+    public boolean onCommand(CommandSender sender, Command cmd,String commandLabel,String[] args){
         if(cmd.getName().equalsIgnoreCase("sironeko")){
             if(args[0].equalsIgnoreCase("h")) {
                 if (args.length < 2) {
@@ -45,14 +45,24 @@ public final class Minedelivery extends JavaPlugin {
                 }
                 ItemStack items = t.getInventory().getItemInMainHand();
                 String string = itemStackArrayToBase64(new ItemStack[]{items});
-                sender.sendMessage(args[0]);
-//                new DeliveryData(this).createdelivery(id,id);
+                UUID senduseruuid = t.getUniqueId();
+                String name = args[2];
+                OfflinePlayer getusername = Bukkit.getOfflinePlayer(name);
+                if(String.valueOf(senduseruuid)==null) {
+                    sender.sendMessage("null!");
+                }
+                if (getusername.hasPlayedBefore()) {
+                    DeliveryData data = null;
+                    data.createdelivery(senduseruuid,getusername.getUniqueId(),string);
+                } else {
+                    sender.sendMessage("そのようなユーザーはいません");
+                }
                 return true;
             }
 
             // 何かの処理
             // コマンドが実行された場合は、trueを返して当メソッドを抜ける。
-            sender.sendMessage("/sironeko [h] [username]");
+//            sender.sendMessage("/sironeko [h] [username]");
             return true;
         }
 
@@ -196,6 +206,9 @@ public final class Minedelivery extends JavaPlugin {
             throw new IOException("Unable to decode class type.", e);
         }
     }
+
+
+
 
 
 }
