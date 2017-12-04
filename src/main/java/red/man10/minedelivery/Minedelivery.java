@@ -3,27 +3,19 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.InvalidConfigurationException;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
-import javax.security.auth.login.Configuration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-
+import red.man10.minedelivery.DeliveryData;
+import java.util.UUID;
 public final class Minedelivery extends JavaPlugin {
 
     @Override
@@ -39,20 +31,22 @@ public final class Minedelivery extends JavaPlugin {
     }
 
 
-    public boolean onCommand(CommandSender sender, Command cmd,String commandLabel, String[] args){
+    public boolean onCommand(CommandSender sender, Command cmd,String commandLabel,UUID id, String[] args){
         if(cmd.getName().equalsIgnoreCase("sironeko")){
             if(args[0].equalsIgnoreCase("h")) {
                 if (args.length < 2) {
                     sender.sendMessage("/sironeko [h] [username]");
                     return false;
                 }
-                Player t = Bukkit.getPlayer(args[1]);
+//                Player t = Bukkit.getPlayer(args[1]);
+                Player t = (Player) sender;
                 if(t == null){
                     return false;
                 }
                 ItemStack items = t.getInventory().getItemInMainHand();
                 String string = itemStackArrayToBase64(new ItemStack[]{items});
-                sender.sendMessage(string);
+                sender.sendMessage(args[0]);
+//                new DeliveryData(this).createdelivery(id,id);
                 return true;
             }
 
