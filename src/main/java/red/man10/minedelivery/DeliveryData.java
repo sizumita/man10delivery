@@ -25,12 +25,11 @@ public class DeliveryData {
     MySQLManager mysql = null;
     public DeliveryData(Minedelivery plugin) {
         this.plugin = plugin;
-        this.mysql = new MySQLManager(plugin,"Delivery");
+        this.mysql = new MySQLManager(plugin, "minedelivery");
         mysql.execute(sqlCreateDeliveryTable);
     }
-
     public String getDeliveryTable() {
-        String del = "delivery";
+        String del = "minedelivery";
         return del;
     }
 
@@ -61,7 +60,7 @@ public class DeliveryData {
         String sql = "update "+getDeliveryTable()+" set"
                 +" ,uuid1='"+uuid1.toString()
                 +"' ,uuid2='"+uuid2.toString()
-                +"' ,data='"+data
+                +"' ,item='"+data
                 +";";
 
         return mysql.execute(sql);
