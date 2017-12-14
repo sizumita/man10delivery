@@ -4,17 +4,25 @@ package red.man10.minedelivery;
  * Created by sizumita on 2017/12/04.
  */
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import red.man10.minedelivery.MySQLManager;
+
+import org.bukkit.Bukkit;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.UUID;
+
 public class DeliveryData {
     private final Minedelivery plugin ;
     MySQLManager mysql = null;
-
     public DeliveryData(Minedelivery plugin) {
         this.plugin = plugin;
         this.mysql = new MySQLManager(plugin,"Delivery");
@@ -26,11 +34,9 @@ public class DeliveryData {
         return del;
     }
 
-    public int createdelivery(UUID uuid1,UUID uuid2,String item){
-
+    public int createdelivery(UUID uuid1, UUID uuid2, String item){
         String senduser = Bukkit.getOfflinePlayer(uuid1).getName();
         String getuser = Bukkit.getOfflinePlayer(uuid2).getName();
-
         boolean ret = mysql.execute("insert into "+getDeliveryTable()+" values(0"
                 +",'" + currentTime()
                 +"','" + uuid1.toString()
@@ -49,6 +55,19 @@ public class DeliveryData {
         return getLatestId();
 
     }
+
+    public boolean updateDelivery(UUID uuid1,UUID uuid2,String data){
+
+        String sql = "update "+getDeliveryTable()+" set"
+                +" ,uuid1='"+uuid1.toString()
+                +"' ,uuid2='"+uuid2.toString()
+                +"' ,data='"+data
+                +";";
+
+        return mysql.execute(sql);
+
+    }
+
     public int getLatestId(){
 
         int ret = -1;

@@ -1,0 +1,12 @@
+mysql:
+  host: localhost
+#  port: 3306
+  user: root
+  pass: pass
+  db: minedelivery
+tax: 0
+prize: 0.5
+fee: 10000
+autobet: 100000
+newbiePlayableCount: 10
+registerKDRLimit: 0.2

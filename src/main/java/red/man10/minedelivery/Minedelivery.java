@@ -11,7 +11,8 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
-
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,6 +21,9 @@ public final class Minedelivery extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
+        // config.ymlを読み込みます。
+        FileConfiguration config = getConfig();
         // Plugin startup logic
 
     }
@@ -44,20 +48,33 @@ public final class Minedelivery extends JavaPlugin {
                     return false;
                 }
                 ItemStack items = t.getInventory().getItemInMainHand();
+
                 String string = itemStackArrayToBase64(new ItemStack[]{items});
                 UUID senduseruuid = t.getUniqueId();
-                String name = args[2];
-                OfflinePlayer getusername = Bukkit.getOfflinePlayer(name);
+                sender.sendMessage(String.valueOf(senduseruuid));
+
+
+                OfflinePlayer getusername = Bukkit.getOfflinePlayer(args[1]);
+                sender.sendMessage(String.valueOf(getusername));
+
                 if(String.valueOf(senduseruuid)==null) {
+
                     sender.sendMessage("null!");
                 }
                 if (getusername.hasPlayedBefore()) {
                     DeliveryData data = null;
+                    sender.sendMessage(String.valueOf(senduseruuid));
+                    sender.sendMessage(String.valueOf(getusername.getUniqueId()));
+                    sender.sendMessage(string);
+
                     data.createdelivery(senduseruuid,getusername.getUniqueId(),string);
+//                    data.updateDelivery(senduseruuid,getusername.getUniqueId(),string);
+                    return true;
                 } else {
                     sender.sendMessage("そのようなユーザーはいません");
+                    return false;
                 }
-                return true;
+
             }
 
             // 何かの処理
