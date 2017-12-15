@@ -36,7 +36,8 @@ public class DeliveryData {
     public int createdelivery(UUID uuid1, UUID uuid2, String item){
         String senduser = Bukkit.getOfflinePlayer(uuid1).getName();
         String getuser = Bukkit.getOfflinePlayer(uuid2).getName();
-        boolean ret = mysql.execute("insert into "+getDeliveryTable()+" values(0"
+        boolean ret = mysql.execute("insert into "+getDeliveryTable()
+//                +" values(0"
                 +",'" + currentTime()
                 +"','" + uuid1.toString()
                 +"','" + uuid2.toString()

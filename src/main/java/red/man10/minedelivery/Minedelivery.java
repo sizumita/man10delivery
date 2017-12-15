@@ -17,6 +17,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.UUID;
+import java.util.function.Supplier;
+
 public final class Minedelivery extends JavaPlugin {
 
     @Override
@@ -62,7 +64,7 @@ public final class Minedelivery extends JavaPlugin {
                     sender.sendMessage("null!");
                 }
                 if (getusername.hasPlayedBefore()) {
-                    DeliveryData data = null;
+                    DeliveryData data = new DeliveryData(this);
                     sender.sendMessage(String.valueOf(senduseruuid));
                     sender.sendMessage(String.valueOf(getusername.getUniqueId()));
                     sender.sendMessage(string);
