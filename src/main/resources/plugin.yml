@@ -3,8 +3,8 @@ version: @version@
 main: red.man10.minedelivery.Minedelivery
 
 commands:
-   sironeko:
+   mpost:
       description: This is a demo command.
-      usage: /<command> [h] [player]
-      permission: tutorialplugin.sironeko
+      usage: /<command> [deli] [player]
+      permission: tutorialplugin.mpost
       permission-message: You don't have <permission>

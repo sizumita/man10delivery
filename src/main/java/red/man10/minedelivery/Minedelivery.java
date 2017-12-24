@@ -2,6 +2,9 @@ package red.man10.minedelivery;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.*;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -12,21 +15,45 @@ import org.bukkit.util.io.BukkitObjectInputStream;
 import org.bukkit.util.io.BukkitObjectOutputStream;
 import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import org.bukkit.Material;
+import org.bukkit.event.Listener;
+import org.bukkit.inventory.meta.ItemMeta;
+import java.util.Arrays;
 import java.util.UUID;
-import java.util.function.Supplier;
+import org.bukkit.event.player.PlayerJoinEvent;
 
-public final class Minedelivery extends JavaPlugin {
+
+public final class Minedelivery extends JavaPlugin implements Listener {
+
+
+    private ItemStack delitem;
+    private ItemStack itemair;
+    private JavaPlugin plugin;
+    private String deliverycommand = null;
+    private String acceptancecommand = null;
+    private String commandname = null;
+    DeliveryData data = new DeliveryData(this);
+
+
+
+
+
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
         // config.ymlを読み込みます。
         FileConfiguration config = getConfig();
+//        deliverycommand = config.getString("deliverycommand");
+//        acceptancecommand = config.getString("acceptancecommand");
+//        commandname = config.getString("commandname");
         // Plugin startup logic
+        getServer().getPluginManager().registerEvents(this, this);
+
+
 
     }
 
@@ -37,57 +64,183 @@ public final class Minedelivery extends JavaPlugin {
     }
 
 
+
+    @EventHandler
+    public void onJoin(PlayerJoinEvent e){
+        Player p = e.getPlayer();
+        UUID id = p.getUniqueId();
+        String itembase64 = data.count(id);
+        if(itembase64 == null) {
+            p.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §l あなた宛の宅配物はありません。");
+
+        } else {
+            p.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §l あなた宛の宅配物があります。");
+            delitem = new ItemStack(Material.DIAMOND_HOE, 1, (short) 774);
+            ItemMeta dicemeta = delitem.getItemMeta();
+            dicemeta.setDisplayName("宅配のダンボール箱");
+            dicemeta.setLore(Arrays.asList("§l右クリックで開けてみよう。"));
+            delitem.setItemMeta(dicemeta);
+            p.getInventory().addItem(delitem);
+        }
+      }
+
+
+
+
     public boolean onCommand(CommandSender sender, Command cmd,String commandLabel,String[] args){
-        if(cmd.getName().equalsIgnoreCase("sironeko")){
-            if(args[0].equalsIgnoreCase("h")) {
-                if (args.length < 2) {
-                    sender.sendMessage("/sironeko [h] [username]");
-                    return false;
+        if(cmd.getName().equalsIgnoreCase("mpost")){
+
+            if(args[0].equalsIgnoreCase("deli")) {
+                itemair = new ItemStack(Material.AIR, 0);
+                    if (args.length != 2) {
+                        return false;
+                    }
+    //                Player t = Bukkit.getPlayer(args[1]);
+                    Player t = (Player) sender;
+                    if(t == null){
+                        return false;
+                    }
+                    ItemStack items = t.getInventory().getItemInMainHand();
+
+                    t.sendMessage(String.valueOf(items));
+                    t.sendMessage(String.valueOf(itemair));
+                    if(items.getType().equals(itemair.getType())){
+                        t.sendMessage("§4§l そのアイテムは送れません！");
+                        return true;
+                    }
+
+                    String string = itemStackArrayToBase64(new ItemStack[]{items});
+                    UUID senduseruuid = t.getUniqueId();
+
+
+                    OfflinePlayer getusername = Bukkit.getOfflinePlayer(args[1]);
+
+                    if(String.valueOf(senduseruuid)==null) {
+
+                        sender.sendMessage("null!");
+                    }
+                if (t.hasPermission("man10.sironeko.send")){
+
+                    if (getusername.hasPlayedBefore()) {
+    //                    DeliveryData data = new DeliveryData(this);
+                        sender.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §r §b あなたのアイテムを配送する準備をしています、、。");
+
+                        data.createdelivery(senduseruuid,getusername.getUniqueId(),string);
+
+
+                        ItemStack air = new ItemStack(Material.AIR);
+                        t.getInventory().setItemInMainHand(air);
+                        sender.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §a 準備が完了しました。配送しています！またのご利用を、お待ちしています。");
+                        getusername.getPlayer().sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §f§lあなたに荷物が届いています！お受け取りください。");
+                        delitem = new ItemStack(Material.DIAMOND_HOE, 1, (short) 774);
+                        ItemMeta dicemeta = delitem.getItemMeta();
+                        dicemeta.setDisplayName("宅配のダンボール箱");
+                        dicemeta.setLore(Arrays.asList("§l右クリックで開けてみよう。"));
+                        delitem.setItemMeta(dicemeta);
+                        t.getInventory().addItem(delitem);
+                        getusername.getPlayer().sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §f§l受け取れなかった場合は、 /"
+                                +commandname+" "+acceptancecommand+" で。");
+                        return true;
+                    } else {
+                        sender.sendMessage("§4§l そのようなユーザーはいません!");
+                        return true;
+                    }
+
                 }
-//                Player t = Bukkit.getPlayer(args[1]);
-                Player t = (Player) sender;
-                if(t == null){
-                    return false;
+
+
+
+            if(args[0].equalsIgnoreCase("ac")) {
+                Player p = (Player) sender;
+                UUID id = p.getUniqueId();
+                if (t.hasPermission("man10.sironeko.acsept")){
+
+
+                String itembase64 = data.count(id);
+//                data.updatedel(p.getName());
+                if(itembase64 == null) {
+                    p.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §l あなた宛の宅配物はありません。");
+
                 }
-                ItemStack items = t.getInventory().getItemInMainHand();
-
-                String string = itemStackArrayToBase64(new ItemStack[]{items});
-                UUID senduseruuid = t.getUniqueId();
-                sender.sendMessage(String.valueOf(senduseruuid));
-
-
-                OfflinePlayer getusername = Bukkit.getOfflinePlayer(args[1]);
-                sender.sendMessage(String.valueOf(getusername));
-
-                if(String.valueOf(senduseruuid)==null) {
-
-                    sender.sendMessage("null!");
-                }
-                if (getusername.hasPlayedBefore()) {
-                    DeliveryData data = new DeliveryData(this);
-                    sender.sendMessage(String.valueOf(senduseruuid));
-                    sender.sendMessage(String.valueOf(getusername.getUniqueId()));
-                    sender.sendMessage(string);
-
-                    data.createdelivery(senduseruuid,getusername.getUniqueId(),string);
-//                    data.updateDelivery(senduseruuid,getusername.getUniqueId(),string);
-                    return true;
+                p.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §a ご利用、ありがとうございました！");
+                delitem = new ItemStack(Material.DIAMOND_HOE, 1, (short) 774);
+                ItemMeta dicemeta = delitem.getItemMeta();
+                dicemeta.setDisplayName("宅配のダンボール箱");
+                dicemeta.setLore(Arrays.asList("§l右クリックで開けてみよう。"));
+                delitem.setItemMeta(dicemeta);
+                p.getInventory().addItem(delitem);
+                return true;
                 } else {
-                    sender.sendMessage("そのようなユーザーはいません");
-                    return false;
+                    p.sendMessage("§4§l パーミッションがありません！");
                 }
-
             }
+        }
+
+
+            return false;
 
             // 何かの処理
             // コマンドが実行された場合は、trueを返して当メソッドを抜ける。
-//            sender.sendMessage("/sironeko [h] [username]");
-            return true;
+//            sender.sendMessage("/sironeko [h] [username]")
+
         }
 
         return false;
         // コマンドが実行されなかった場合は、falseを返して当メソッドを抜ける。
     }
+
+//
+    @EventHandler
+    public void onRightClick(PlayerInteractEvent event){
+        Player p = event.getPlayer();
+        String itembase64;
+        if (p.hasPermission("man10.sironeko.acsept")){
+        ItemStack handitem =p.getInventory().getItemInMainHand();
+        delitem = new ItemStack(Material.DIAMOND_HOE, 1, (short) 774);
+        ItemMeta dicemeta = delitem.getItemMeta();
+        dicemeta.setDisplayName("宅配のダンボール箱");
+        dicemeta.setLore(Arrays.asList("§l右クリックで開けてみよう。"));
+        delitem.setItemMeta(dicemeta);
+        if (event.getAction().equals(Action.RIGHT_CLICK_AIR)
+                && event.getPlayer().getInventory().getItemInMainHand().getItemMeta().equals(delitem.getItemMeta())) {
+            UUID id = p.getUniqueId();
+            itembase64 = data.count(id);
+            data.updatedel(p.getUniqueId());
+            if(itembase64 == null) {
+
+                ItemStack air = new ItemStack(Material.AIR);
+                p.getInventory().setItemInMainHand(air);
+
+                p.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §4§l 中身は空だった、、、。");
+            }
+            try {
+                p.getInventory().addItem(itemStackArrayFromBase64(itembase64));
+                p.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §f§l中からアイテムが出てきた！");
+                String itembase = data.count(id);
+                data.updatedel(p.getUniqueId());
+                if(itembase == null) {
+
+                    ItemStack air = new ItemStack(Material.AIR);
+                    p.getInventory().setItemInMainHand(air);
+
+                    p.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §f§l もう中身はないようだ。");
+                } else {
+                    p.sendMessage("§e§l[§f§l 白猫ヤマト §e§l] §f§l まだ中にアイテムが入っているようだ。");
+
+                }
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+        }
+
+    }
+
+
+
+
     public static String[] playerInventoryToBase64(PlayerInventory playerInventory) throws IllegalStateException {
         //get the main content part, this doesn't return the armor
         String content = toBase64(playerInventory);
@@ -208,6 +361,8 @@ public final class Minedelivery extends JavaPlugin {
      * @return ItemStack array created from the Base64 string.
      * @throws IOException
      */
+
+
     public static ItemStack[] itemStackArrayFromBase64(String data) throws IOException {
         try {
             ByteArrayInputStream inputStream = new ByteArrayInputStream(Base64Coder.decodeLines(data));
@@ -225,9 +380,6 @@ public final class Minedelivery extends JavaPlugin {
             throw new IOException("Unable to decode class type.", e);
         }
     }
-
-
-
 
 
 }

@@ -10,3 +10,6 @@ fee: 10000
 autobet: 100000
 newbiePlayableCount: 10
 registerKDRLimit: 0.2
+deliverycommand: deli
+acceptancecommand: ac
+commandname: mpost
